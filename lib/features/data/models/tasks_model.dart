@@ -1,6 +1,3 @@
-// models for our task management app
-// these represent the data we work with
-
 enum TaskPriority {
   low,
   medium,

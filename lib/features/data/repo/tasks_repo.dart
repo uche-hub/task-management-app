@@ -1,8 +1,9 @@
-import 'package:task_management_app/features/data/dao/tasks_dao.dart';
-import 'package:task_management_app/features/data/models/tasks_model.dart';
+
 
 // sits between the UI and database
 // handles any business logic before saving/loading data
+import '../../../task_core.dart';
+
 class TaskRepository {
   final TaskDao _dao;
 

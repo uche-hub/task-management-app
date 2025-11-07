@@ -1,6 +1,6 @@
 import 'package:sqflite/sqflite.dart';
-import 'package:task_management_app/data/database_helper.dart';
-import 'package:task_management_app/features/data/models/tasks_model.dart';
+
+import '../../../task_core.dart';
 
 // handles all database operations for tasks
 // this is the only place where we talk to the database
