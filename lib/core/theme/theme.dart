@@ -9,20 +9,16 @@ class AppColors {
   static const Color scaffoldBackgroundLight = Color(0xFFF7F7F7);
   static const Color scaffoldBackgroundDark = Color(0xFF121212);
 
-  // Card Colors from Screenshot for reference/use
+  // Card Colors
   static const Color cardProposal = Color(0xFF388E3C); // Dark Green
   static const Color cardMeeting = Color(0xFFE65100);  // Dark Orange
   static const Color cardDesign = Color(0xFFFBC02D);   // Dark Yellow
 
-  // Opacity for Glassmorphism
-  static final Color glassPrimary = primaryBlue.withValues(alpha: 0.1);
-  static final Color glassSecondary = Colors.white.withValues(alpha: 0.25);
-
-  // Status/Task Card Colors (as seen in the screenshot)
+  // Status/Task Card Colors
   static final Color cardColor1 = Color(0xFF4CAF50).withValues(alpha: 0.8); // Green
   static final Color cardColor2 = Color(0xFFFF9800).withValues(alpha: 0.8); // Orange
   static final Color cardColor3 = Color(0xFFFFEB3B).withValues(alpha: 0.8); // Yellow
-  static final Color cardColor4 = primaryBlue.withValues(alpha: 0.8);       // Fallback/Extra
+  static final Color cardColor4 = primaryBlue.withValues(alpha: 0.8);  // blue
 }
 
 // Light Theme
@@ -49,7 +45,7 @@ ThemeData get lightTheme => ThemeData(
       )
     );
 
-// Dark Theme (Basic setup, could be expanded)
+// Dark Theme
 ThemeData get darkTheme => ThemeData(
       colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.primaryBlue,
