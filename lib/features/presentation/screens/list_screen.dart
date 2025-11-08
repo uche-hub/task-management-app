@@ -1,8 +1,7 @@
-// lib/features/presentation/screens/list_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:task_management_app/features/data/models/task_list.dart';
-import 'package:task_management_app/features/data/repo/list_task_stats.dart';
+import 'package:task_management_app/features/presentation/widgets/list%20screen%20widgets/list_app_bar.dart';
+import 'package:task_management_app/features/presentation/widgets/list%20screen%20widgets/list_items_view.dart';
 import '../../../task_core.dart';
 
 class ListsScreen extends ConsumerStatefulWidget {
@@ -34,141 +33,40 @@ class _ListsScreenState extends ConsumerState<ListsScreen>
 
   @override
   Widget build(BuildContext context) {
-    ResponsiveSize.init(context);
     final cs = Theme.of(context).colorScheme;
-    final listsAsync = ref.watch(listsProvider); 
+    final listsAsync = ref.watch(listsProvider);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: _appBar(cs),
+      appBar: ListAppBar(cs: cs),
       body: Container(
-        decoration: _bgGradient(cs),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [cs.primary.withValues(alpha: 0.1), Colors.transparent],
+            stops: const [0.0, 0.3],
+          ),
+        ),
         child: listsAsync.when(
-          loading: () => const CustomLoader(), 
+          loading: () => const CustomLoader(),
           error: (e, _) => ErrorState(error: e, onRetry: _retry),
-          data: (lists) =>
-              lists.isEmpty ? const EmptyState() : _buildRefreshableList(lists), // <--- CHANGED
+          data: (lists) => lists.isEmpty
+              ? const EmptyState()
+              : ListItemsView(
+                  lists: lists,
+                  onRefresh: _retry,
+                  onTap: (list) => AppRouter.router.push(RouterPath.tasksScreen, extra: list),
+                  onRename: _showRename,
+                  onDelete: _showDelete,
+                ),
         ),
       ),
-      floatingActionButton: ListsFAB(
-        controller: _fabCtrl,
-        onPressed: _showCreate,
-      ),
+      floatingActionButton: ListsFAB(controller: _fabCtrl, onPressed: _showCreate),
     );
   }
 
-  // --- NEW: Refreshable List Wrapper ---
-  Widget _buildRefreshableList(List<ListTaskStats> lists) {
-    // The RefreshIndicator calls the _retry function to reload data
-    return RefreshIndicator(
-      onRefresh: _retry,
-      color: Theme.of(context).colorScheme.primary,
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      child: _listView(lists),
-    );
-  }
-  
-  // --- Existing AppBar & Background methods ---
-
-  PreferredSizeWidget _appBar(ColorScheme cs) {
-    return AppBar(
-      automaticallyImplyLeading: false, 
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      title: Padding( 
-        padding: EdgeInsets.only(left: ResponsiveSize.width(4)),
-        child: Text(
-          'Manage your to do List', 
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: ResponsiveSize.fontSize(20),
-            color: cs.onSurface,
-          ),
-        ),
-      ),
-      centerTitle: false,
-      actions: [
-        IconButton(
-          icon: Container(
-            padding: EdgeInsets.all(ResponsiveSize.width(8)),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: cs.surface.withValues(alpha: 0.2), 
-              border: Border.all(color: cs.onSurface.withValues(alpha: 0.1)), 
-            ),
-            child: Icon(
-              Icons.search_rounded,
-              size: ResponsiveSize.icon(24),
-              color: cs.onSurface,
-            ),
-          ),
-          onPressed: () => AppRouter.router.push(RouterPath.searchScreen),
-        ),
-        SizedBox(width: ResponsiveSize.width(8)),
-      ],
-    );
-  }
-
-  BoxDecoration _bgGradient(ColorScheme cs) => BoxDecoration(
-    gradient: LinearGradient(
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-      colors: [
-        cs.primary.withValues(alpha: 0.1),
-        Colors.transparent
-      ],
-      stops: const [0.0, 0.3],
-    ),
-  );
-
-  Widget _listView(List<ListTaskStats> lists) {
-    return ListView.separated(
-      padding: EdgeInsets.fromLTRB(
-        ResponsiveSize.width(20),
-        ResponsiveSize.height(110),
-        ResponsiveSize.width(20),
-        ResponsiveSize.height(100),
-      ),
-      separatorBuilder: (_, __) => SizedBox(height: ResponsiveSize.height(16)),
-      itemCount: lists.length,
-      itemBuilder: (_, i) {
-        final stats = lists[i];
-        return ListCard(
-          list: stats.list,
-          totalTasks: stats.totalTasks,
-          doneTasks: stats.doneTasks,
-          progress: stats.progress,
-          cardColor: _getCardColor(i),
-          onTap: () =>
-              AppRouter.router.push(RouterPath.tasksScreen, extra: stats.list),
-          onRename: () => _showRename(stats.list),
-          onDelete: () => _showDelete(stats.list),
-        );
-      },
-    );
-  }
-  
-  // --- Existing List Logic methods ---
-
-  Color _getCardColor(int index) {
-    switch (index % 4) {
-      case 0:
-        return AppColors.cardColor1;
-      case 1:
-        return AppColors.cardColor2;
-      case 2:
-        return AppColors.cardColor3;
-      case 3:
-        return AppColors.cardColor4;
-      default:
-        return AppColors.cardColor4;
-    }
-  }
-
-  Future<void> _retry() async {
-    // Note: The RefreshIndicator expects a Future<void> return
-    await ref.read(listsProvider.notifier).loadLists();
-  }
+  Future<void> _retry() async => ref.read(listsProvider.notifier).loadLists();
 
   void _showCreate() => showCreateListDialog(
     context: context,
