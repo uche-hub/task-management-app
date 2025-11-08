@@ -1,5 +1,4 @@
-// lib/utils/responsive_size.dart
-import 'dart:math'; // ← ADD THIS
+import 'dart:math';
 import 'package:flutter/widgets.dart';
 
 enum DeviceType { phone, tablet }
@@ -18,7 +17,6 @@ class ResponsiveSize {
     deviceType = shortestSide >= 600 ? DeviceType.tablet : DeviceType.phone;
   }
 
-  // HEIGHT
   static double height(double size) {
     const double phoneRef = 812.0;
     const double tabletRef = 1024.0;
@@ -26,7 +24,6 @@ class ResponsiveSize {
     return size * (screenHeight / ref);
   }
 
-  // WIDTH
   static double width(double size) {
     const double phoneRef = 375.0;
     const double tabletRef = 768.0;
@@ -34,14 +31,13 @@ class ResponsiveSize {
     return size * (screenWidth / ref);
   }
 
-  // FONT SIZE (with max cap for tablets)
+  // FONT SIZE
   static double fontSize(double size) {
     const double phoneRef = 375.0;
     const double tabletRef = 768.0;
     final ref = deviceType == DeviceType.tablet ? tabletRef : phoneRef;
     final scaled = size * (screenWidth / ref);
 
-    // Replace coerceAtMost with min()
     return deviceType == DeviceType.tablet ? min(scaled, size * 1.4) : scaled;
   }
 

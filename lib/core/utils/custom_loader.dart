@@ -1,5 +1,3 @@
-// lib/core/utils/custom_loader.dart
-
 import 'package:flutter/material.dart';
 import '../../task_core.dart';
 
