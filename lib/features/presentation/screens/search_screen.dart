@@ -1,6 +1,7 @@
 // lib/features/presentation/screens/search_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:task_management_app/features/presentation/provider/tasks_notifier.dart';
 import 'package:task_management_app/features/presentation/widgets/search%20widgets/search_no_results.dart';
 import '../../../task_core.dart';
 import '../widgets/search widgets/search_empty.dart';
