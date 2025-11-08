@@ -1,6 +1,4 @@
-import 'package:task_management_app/core/enum/task_priority.dart';
-import 'package:task_management_app/core/enum/task_status.dart';
-import 'package:task_management_app/features/data/models/task_tag.dart';
+import '../../../task_core.dart';
 
 class Task {
   final String id;
@@ -95,7 +93,7 @@ class Task {
     // Only compare date parts to check for overdue status
     final taskDate = DateTime(dueDate!.year, dueDate!.month, dueDate!.day);
     final todayDate = DateTime(today.year, today.month, today.day);
-    
+
     return taskDate.isBefore(todayDate);
   }
 }

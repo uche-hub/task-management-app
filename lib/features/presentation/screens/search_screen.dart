@@ -1,12 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:task_management_app/features/presentation/provider/tasks_notifier.dart';
-import 'package:task_management_app/features/presentation/widgets/search%20widgets/search_app_bar.dart';
-import 'package:task_management_app/features/presentation/widgets/search%20widgets/search_result_list.dart';
 import '../../../task_core.dart';
-import '../widgets/search widgets/search_empty.dart';
-import '../widgets/search widgets/search_error.dart';
-import '../widgets/search widgets/search_loading.dart';
-import '../widgets/search widgets/search_no_results.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});

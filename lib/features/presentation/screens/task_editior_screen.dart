@@ -1,17 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:task_management_app/core/enum/task_priority.dart';
-import 'package:task_management_app/core/enum/task_status.dart';
-import 'package:task_management_app/features/data/models/task_tag.dart';
-import 'package:task_management_app/features/presentation/provider/tag_notifier.dart';
-import 'package:task_management_app/features/presentation/provider/tasks_notifier.dart';
-import 'package:task_management_app/features/presentation/widgets/task%20editor%20widgets/editor_due_date_field.dart';
-import 'package:task_management_app/features/presentation/widgets/task%20editor%20widgets/editor_input_field.dart';
-import 'package:task_management_app/features/presentation/widgets/task%20editor%20widgets/editor_priority_selector_segmented.dart';
-import 'package:task_management_app/features/presentation/widgets/task%20editor%20widgets/editor_simple_info_field.dart';
-import 'package:task_management_app/features/presentation/widgets/task%20editor%20widgets/editor_status_segmented.dart';
-import 'package:task_management_app/features/presentation/widgets/task%20editor%20widgets/editor_tag_error_state.dart';
-import 'package:task_management_app/features/presentation/widgets/task%20editor%20widgets/editor_tag_management.dart';
 
 import '../../../task_core.dart';
 

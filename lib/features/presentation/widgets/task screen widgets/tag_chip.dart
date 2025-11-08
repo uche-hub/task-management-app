@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:task_management_app/features/data/models/task_tag.dart';
 import '../../../../task_core.dart';
 
 class TagChip extends StatelessWidget {

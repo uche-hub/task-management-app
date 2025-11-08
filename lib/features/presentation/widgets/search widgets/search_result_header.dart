@@ -1,4 +1,3 @@
-// lib/widgets/search_result_header.dart
 import 'package:flutter/material.dart';
 
 import '../../../../task_core.dart';

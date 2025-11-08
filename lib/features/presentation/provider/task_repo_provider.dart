@@ -1,17 +1,12 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
-import 'package:task_management_app/features/data/models/task_list.dart';
-import 'package:task_management_app/features/data/models/tasks_model.dart';
-import 'package:task_management_app/features/data/repo/list_task_stats.dart';
-import 'package:task_management_app/features/data/repo/tasks_repo.dart';
+import '../../../task_core.dart';
 
-// provides the repository instance
 final taskRepositoryProvider = Provider<TaskRepository>((ref) {
   return TaskRepository();
 });
 
 // Manages the list of task lists with their stats
-class ListsStatsNotifier extends StateNotifier<AsyncValue<List<ListTaskStats>>> { 
+class ListsStatsNotifier
+    extends StateNotifier<AsyncValue<List<ListTaskStats>>> {
   final TaskRepository _repository;
 
   ListsStatsNotifier(this._repository) : super(const AsyncValue.loading()) {
@@ -22,9 +17,9 @@ class ListsStatsNotifier extends StateNotifier<AsyncValue<List<ListTaskStats>>> 
   Future<void> loadLists() async {
     state = const AsyncValue.loading();
     try {
-      final listStatsMap = await _repository.getListsWithTaskStats(); 
+      final listStatsMap = await _repository.getListsWithTaskStats();
       final lists = listStatsMap.values.toList()
-        ..sort((a, b) => b.list.createdAt.compareTo(a.list.createdAt)); 
+        ..sort((a, b) => b.list.createdAt.compareTo(a.list.createdAt));
 
       state = AsyncValue.data(lists);
     } catch (e, stack) {
@@ -62,10 +57,13 @@ class ListsStatsNotifier extends StateNotifier<AsyncValue<List<ListTaskStats>>> 
 }
 
 // Provider for lists
-final listsProvider = StateNotifierProvider<ListsStatsNotifier, AsyncValue<List<ListTaskStats>>>((ref) { 
-  final repository = ref.watch(taskRepositoryProvider);
-  return ListsStatsNotifier(repository);
-});
+final listsProvider =
+    StateNotifierProvider<ListsStatsNotifier, AsyncValue<List<ListTaskStats>>>((
+      ref,
+    ) {
+      final repository = ref.watch(taskRepositoryProvider);
+      return ListsStatsNotifier(repository);
+    });
 
 final dueSoonTasksProvider = FutureProvider<List<Task>>((ref) async {
   final repository = ref.watch(taskRepositoryProvider);
@@ -76,7 +74,7 @@ final searchQueryProvider = StateProvider<String>((ref) => '');
 final searchResultsProvider = FutureProvider<List<Task>>((ref) async {
   final query = ref.watch(searchQueryProvider);
   if (query.isEmpty) return [];
-  
+
   final repository = ref.watch(taskRepositoryProvider);
   return await repository.searchTasks(query);
 });

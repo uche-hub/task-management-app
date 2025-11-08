@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:task_management_app/core/enum/task_priority.dart';
-import 'package:task_management_app/core/enum/task_status.dart';
 
 import '../../../task_core.dart';
 
-// displays a single task in a list
 class TaskItem extends StatelessWidget {
   final Task task;
   final VoidCallback onTap;

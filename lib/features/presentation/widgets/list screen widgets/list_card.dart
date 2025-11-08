@@ -1,12 +1,5 @@
-// lib/features/presentation/widgets/list screen widgets/list_card.dart
-
 import 'package:flutter/material.dart';
-import 'package:task_management_app/features/data/models/task_list.dart';
 import '../../../../task_core.dart';
-
-// Removed 'dart:ui' import
-
-// Removed _GlassmorphicCard widget
 
 class ListCard extends StatelessWidget {
   final TaskList list;
@@ -32,8 +25,8 @@ class ListCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // The delay calculation logic can be simplified or removed for clean code
-    const delay = 400; // Fixed delay for cleaner animation logic
+    // The delay calculation logic
+    const delay = 400;
 
     return TweenAnimationBuilder<double>(
       duration: const Duration(milliseconds: delay),
@@ -45,10 +38,12 @@ class ListCard extends StatelessWidget {
       ),
       child: GestureDetector(
         onTap: onTap,
-        // --- START: Removed GlassmorphicCard and replaced with standard Container ---
+
         child: Container(
           decoration: BoxDecoration(
-            color: cardColor.withValues(alpha: 0.9), // Slightly transparent solid color
+            color: cardColor.withValues(
+              alpha: 0.9,
+            ), // Slightly transparent solid color
             borderRadius: BorderRadius.circular(ResponsiveSize.width(24)),
             boxShadow: [
               BoxShadow(
@@ -57,7 +52,6 @@ class ListCard extends StatelessWidget {
                 offset: const Offset(0, 8),
               ),
             ],
-            // Removed border
           ),
           child: Padding(
             padding: EdgeInsets.all(ResponsiveSize.width(20)),
@@ -78,34 +72,31 @@ class ListCard extends StatelessWidget {
             ),
           ),
         ),
-        // --- END: Removed GlassmorphicCard and replaced with standard Container ---
       ),
     );
   }
 
   Widget _buildHeader(BuildContext context) {
-    // ... (content remains the same, uses list.name) ...
     final cs = Theme.of(context).colorScheme;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          list.name, // The list name serves as the category name
+          list.name,
           style: TextStyle(
             color: Colors.white.withValues(alpha: 0.8),
             fontSize: ResponsiveSize.fontSize(14),
             fontWeight: FontWeight.w600,
           ),
         ),
-        _popup(cs), // Horizontal 3-dot menu
+        _popup(cs),
       ],
     );
   }
 
   Widget _buildTitle(BuildContext context) {
-    // ... (content remains the same, uses list.name) ...
     return Text(
-      'Tasks in ${list.name}', // Generic title for the list screen
+      'Tasks in ${list.name}',
       style: TextStyle(
         color: Colors.white,
         fontSize: ResponsiveSize.fontSize(22),
@@ -118,7 +109,6 @@ class ListCard extends StatelessWidget {
   }
 
   Widget _buildStatsAndProgress(BuildContext context) {
-    // ... (content remains the same, uses totalTasks, doneTasks, progress) ...
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -145,7 +135,6 @@ class ListCard extends StatelessWidget {
               ),
             ),
             SizedBox(width: ResponsiveSize.width(16)),
-            // Forward arrow icon
             Icon(
               Icons.arrow_forward_rounded,
               color: Colors.white.withValues(alpha: 0.9),
@@ -158,32 +147,45 @@ class ListCard extends StatelessWidget {
   }
 
   Widget _popup(ColorScheme cs) => PopupMenuButton<String>(
-        icon: Icon(Icons.more_horiz_rounded, color: Colors.white),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        elevation: 10,
-        color: cs.surface, // Use solid surface color
-        itemBuilder: (_) => [
-          _item('rename', 'Rename', Icons.edit_outlined, cs.onSurface),
-          _item('delete', 'Delete', Icons.delete_outline, Colors.red),
-        ],
-        onSelected: (v) => v == 'rename' ? onRename() : onDelete(),
-      );
+    icon: Icon(Icons.more_horiz_rounded, color: Colors.white),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    elevation: 10,
+    color: cs.surface,
+    itemBuilder: (_) => [
+      _item('rename', 'Rename', Icons.edit_outlined, cs.onSurface),
+      _item('delete', 'Delete', Icons.delete_outline, Colors.red),
+    ],
+    onSelected: (v) => v == 'rename' ? onRename() : onDelete(),
+  );
 
-  PopupMenuItem<String> _item(String value, String text, IconData icon, Color color) {
+  PopupMenuItem<String> _item(
+    String value,
+    String text,
+    IconData icon,
+    Color color,
+  ) {
     return PopupMenuItem(
       value: value,
-      child: Row(children: [
-        Container(
-          padding: EdgeInsets.all(ResponsiveSize.width(6)),
-          decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
-          child: Icon(icon, size: 18, color: color),
-        ),
-        SizedBox(width: ResponsiveSize.width(12)),
-        Text(text,
+      child: Row(
+        children: [
+          Container(
+            padding: EdgeInsets.all(ResponsiveSize.width(6)),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, size: 18, color: color),
+          ),
+          SizedBox(width: ResponsiveSize.width(12)),
+          Text(
+            text,
             style: TextStyle(
-                fontWeight: FontWeight.w600,
-                color: value == 'delete' ? Colors.red : color)),
-      ]),
+              fontWeight: FontWeight.w600,
+              color: value == 'delete' ? Colors.red : color,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

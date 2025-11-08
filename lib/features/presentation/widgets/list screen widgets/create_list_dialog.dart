@@ -1,4 +1,3 @@
-// lib/widgets/create_list_dialog.dart
 import 'package:flutter/material.dart';
 
 import '../../../../task_core.dart';

@@ -1,10 +1,8 @@
-// lib/core/theme/theme.dart
-
 import 'package:flutter/material.dart';
 
 class AppColors {
   // Core App Colors
-  static const Color primaryBlue = Color(0xFF4C7FFF); // A nice blue
+  static const Color primaryBlue = Color(0xFF4C7FFF);
   static const Color accentYellow = Color(0xFFFFB300);
   static const Color scaffoldBackgroundLight = Color(0xFFF7F7F7);
   static const Color scaffoldBackgroundDark = Color(0xFF121212);

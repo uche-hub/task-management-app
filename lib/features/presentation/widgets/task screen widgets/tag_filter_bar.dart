@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:task_management_app/features/presentation/provider/tag_notifier.dart';
-import 'package:task_management_app/features/presentation/provider/tasks_notifier.dart';
 import '../../../../task_core.dart';
 import 'tag_chip.dart';
 

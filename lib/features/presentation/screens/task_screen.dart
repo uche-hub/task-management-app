@@ -1,13 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:task_management_app/core/enum/task_filter.dart';
-import 'package:task_management_app/core/enum/task_status.dart';
-import 'package:task_management_app/features/data/models/task_list.dart';
-import 'package:task_management_app/features/presentation/provider/tasks_notifier.dart';
 import '../../../task_core.dart';
-import '../widgets/task screen widgets/task_header_appbar.dart';
-import '../widgets/task screen widgets/tag_filter_bar.dart';
-import '../widgets/task screen widgets/task_list_view.dart';
-import '../widgets/task screen widgets/error_state_widget.dart';
 
 class TasksScreen extends ConsumerStatefulWidget {
   final TaskList list;

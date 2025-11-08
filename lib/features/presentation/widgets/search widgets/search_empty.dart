@@ -1,6 +1,6 @@
-// lib/widgets/search_empty.dart
 import 'package:flutter/material.dart';
-import 'package:task_management_app/core/utils/app_responsiveness.dart';
+
+import '../../../../task_core.dart';
 
 class SearchEmpty extends StatelessWidget {
   const SearchEmpty({super.key});

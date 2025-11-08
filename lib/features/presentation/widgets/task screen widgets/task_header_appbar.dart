@@ -1,14 +1,10 @@
-// lib/features/presentation/widgets/task screen widgets/task_header_appbar.dart
-
 import 'package:flutter/material.dart';
-import 'package:task_management_app/core/enum/sort_option.dart';
-import 'package:task_management_app/core/enum/task_filter.dart';
 import '../../../../task_core.dart';
 
 class TaskHeaderAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String listName;
   final TaskFilter currentFilter;
-  final bool isFilterVisible; // <--- NEW PROP
+  final bool isFilterVisible; 
   final Function(TaskFilter) onFilterChanged;
   final Function(SortOption) onSortSelected;
   final VoidCallback onFilterIconTap;
@@ -17,14 +13,14 @@ class TaskHeaderAppBar extends StatelessWidget implements PreferredSizeWidget {
     super.key,
     required this.listName,
     required this.currentFilter,
-    required this.isFilterVisible, // <--- NEW
+    required this.isFilterVisible, 
     required this.onFilterChanged,
     required this.onSortSelected,
-    required this.onFilterIconTap, // <--- NEW
+    required this.onFilterIconTap,
   });
 
   @override
-  Size get preferredSize => Size.fromHeight(ResponsiveSize.height(130)); // Tall enough for title and tabs
+  Size get preferredSize => Size.fromHeight(ResponsiveSize.height(130)); 
 
   @override
   Widget build(BuildContext context) {

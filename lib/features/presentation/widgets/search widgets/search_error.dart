@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:task_management_app/core/utils/app_responsiveness.dart';
+
+import '../../../../task_core.dart';
 
 class SearchError extends StatelessWidget {
   final Object error;

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:task_management_app/features/presentation/provider/tasks_notifier.dart';
-import '../../../../core/enum/task_filter.dart';
 import '../../../../task_core.dart';
 import 'task_list_item.dart';
 

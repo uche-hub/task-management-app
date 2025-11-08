@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:task_management_app/features/presentation/widgets/task%20editor%20widgets/editor_priority_selector_segmented.dart';
-import '../../../../core/enum/task_status.dart';
+import 'package:task_management_app/task_core.dart';
 
 class EditorStatusSegmented extends StatelessWidget {
   final TaskStatus selectedStatus;

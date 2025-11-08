@@ -1,10 +1,6 @@
-// lib/features/presentation/widgets/task editor widgets/editor_priority_selector_segmented.dart
-
 import 'package:flutter/material.dart';
-import 'package:task_management_app/core/enum/task_priority.dart';
 import '../../../../task_core.dart';
 
-// Extension to help capitalize the first letter of a string
 extension StringExtension on String {
     String capitalize() {
       return "${this[0].toUpperCase()}${substring(1).toLowerCase()}";

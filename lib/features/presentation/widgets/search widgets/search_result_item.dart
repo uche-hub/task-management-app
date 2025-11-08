@@ -1,7 +1,4 @@
-// lib/features/presentation/widgets/search widgets/search_result_item.dart
-
 import 'package:flutter/material.dart';
-import 'package:task_management_app/features/presentation/widgets/task_options_button.dart';
 import '../../../../task_core.dart';
 
 class SearchResultItem extends StatelessWidget {
@@ -31,7 +28,6 @@ class SearchResultItem extends StatelessWidget {
           horizontal: ResponsiveSize.width(16),
           vertical: ResponsiveSize.height(12),
         ),
-        // --- CLEAN STYLING ---
         decoration: BoxDecoration(
           color: cs.surface,
           borderRadius: BorderRadius.circular(ResponsiveSize.radius(16)),
@@ -44,7 +40,6 @@ class SearchResultItem extends StatelessWidget {
           ],
           border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.5), width: 1),
         ),
-        // --- END CLEAN STYLING ---
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -97,7 +92,7 @@ class SearchResultItem extends StatelessWidget {
                     )
                   else
                     Text(
-                      'List: ${task.listId}', // Fallback to show context (List ID is complex to resolve here, but kept for context)
+                      'List: ${task.listId}',
                       style: TextStyle(fontSize: ResponsiveSize.fontSize(13), color: cs.onSurfaceVariant),
                     ),
                 ],
@@ -105,7 +100,7 @@ class SearchResultItem extends StatelessWidget {
             ),
 
             // Trailing Options
-            TaskOptionsButton( // Reuse the helper widget
+            TaskOptionsButton(
               onDelete: onDelete,
               onToggle: onToggle,
               isDone: isDone,

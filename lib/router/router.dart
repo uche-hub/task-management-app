@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:task_management_app/features/data/models/task_list.dart';
 import 'package:task_management_app/task_core.dart';
 
 class AppRouter {

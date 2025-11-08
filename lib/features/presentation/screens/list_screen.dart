@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:task_management_app/features/data/models/task_list.dart';
-import 'package:task_management_app/features/presentation/widgets/list%20screen%20widgets/list_app_bar.dart';
-import 'package:task_management_app/features/presentation/widgets/list%20screen%20widgets/list_items_view.dart';
 import '../../../task_core.dart';
 
 class ListsScreen extends ConsumerStatefulWidget {
