@@ -23,7 +23,7 @@ class AppRouter {
         path: RouterPath.tasksScreen,
         pageBuilder: (context, state) {
           final list =
-              state.extra as TaskList; // assuming TaskList is your list type
+              state.extra as TaskList; 
           return NoTransitionPage(child: TasksScreen(list: list));
         },
       ),
