@@ -1,7 +1,14 @@
-import 'package:flutter/material.dart';
-import '../../../task_core.dart';
+// lib/features/presentation/screens/search_screen.dart
 
-// global search across all tasks
+import 'package:flutter/material.dart';
+import 'package:task_management_app/features/presentation/widgets/search%20widgets/search_no_results.dart';
+import '../../../task_core.dart';
+import '../widgets/search widgets/search_empty.dart';
+import '../widgets/search widgets/search_error.dart';
+import '../widgets/search widgets/search_loading.dart';
+import '../widgets/search widgets/search_result_header.dart';
+import '../widgets/search widgets/search_result_item.dart';
+
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
 
@@ -13,132 +20,86 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   final _searchController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    // Initialize controller with current query from provider
+    final query = ref.read(searchQueryProvider);
+    _searchController.text = query;
+    _searchController.addListener(_onSearchChanged);
+  }
+
+  @override
   void dispose() {
+    _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
     super.dispose();
   }
 
+  void _onSearchChanged() {
+    // Update the provider instantly on change
+    ref.read(searchQueryProvider.notifier).state = _searchController.text;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final searchResults = ref.watch(searchResultsProvider);
     final query = ref.watch(searchQueryProvider);
+    final results = ref.watch(searchResultsProvider);
+    final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        titleSpacing: 0,
-        title: Container(
-          height: 42,
-          margin: const EdgeInsets.only(right: 8),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha:0.6),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: TextField(
-            controller: _searchController,
-            autofocus: true,
-            style: const TextStyle(fontSize: 16),
-            decoration: InputDecoration(
-              hintText: 'Search tasks by title or tags',
-              hintStyle: TextStyle(color: Colors.grey[600]),
-              border: InputBorder.none,
-              prefixIcon: const Icon(Icons.search_rounded, color: Colors.grey),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      extendBodyBehindAppBar: true,
+      appBar: _buildAppBar(cs, query.isNotEmpty), // Custom AppBar for iOS-style header
+      body: Container(
+        decoration: _backgroundGradient(cs),
+        child: Column(
+          children: [
+            SizedBox(height: MediaQuery.of(context).padding.top + ResponsiveSize.height(60)), // Space for AppBar
+            
+            // Search Input Field (Moved from AppBar to body area for simpler control)
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: ResponsiveSize.width(20)),
+              child: _buildSearchInputField(cs, query),
             ),
-            onChanged: (value) {
-              ref.read(searchQueryProvider.notifier).state = value;
-            },
-          ),
-        ),
-        actions: [
-          if (query.isNotEmpty)
-            IconButton(
-              icon: const Icon(Icons.clear_rounded),
-              onPressed: () {
-                _searchController.clear();
-                ref.read(searchQueryProvider.notifier).state = '';
-              },
-            ),
-        ],
-      ),
-      body: searchResults.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+            
+            SizedBox(height: ResponsiveSize.height(16)),
+            
+            Expanded(
+              child: results.when(
+                loading: () => const SearchLoading(),
+                error: (e, _) => SearchError(error: e),
+                data: (tasks) {
+                  if (query.isEmpty) return const SearchEmpty();
+                  if (tasks.isEmpty) return const SearchNoResults();
 
-        error: (error, stack) => _buildErrorState(context, error),
-
-        data: (tasks) {
-          if (query.isEmpty) return _buildEmptyPrompt(context);
-
-          if (tasks.isEmpty) return _buildNoResults(context);
-
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                child: Text(
-                  '${tasks.length} result${tasks.length == 1 ? '' : 's'} found',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
-                ),
-              ),
-              Expanded(
-                child: ListView.separated(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  separatorBuilder: (_, __) => const SizedBox(height: 10),
-                  itemCount: tasks.length,
-                  itemBuilder: (context, index) {
-                    final task = tasks[index];
-                    return Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface,
-                        borderRadius: BorderRadius.circular(14),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha:0.05),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SearchResultHeader(count: tasks.length),
+                      Expanded(
+                        child: ListView.separated(
+                          padding: EdgeInsets.fromLTRB(
+                            ResponsiveSize.width(20),
+                            ResponsiveSize.height(12),
+                            ResponsiveSize.width(20),
+                            ResponsiveSize.height(100),
                           ),
-                        ],
+                          separatorBuilder: (_, __) => SizedBox(height: ResponsiveSize.height(14)),
+                          itemCount: tasks.length,
+                          itemBuilder: (_, i) {
+                            final task = tasks[i];
+                            return SearchResultItem(
+                              task: task,
+                              onTap: () => _editTask(task),
+                              onToggle: () => _toggleTask(task),
+                              onDelete: () => _showDelete(task),
+                            );
+                          },
+                        ),
                       ),
-                      child: TaskItem(
-                        task: task,
-                        onTap: () => _editTask(task),
-                        onToggleComplete: () {
-                          ref.read(tasksProvider(task.listId).notifier).toggleComplete(task);
-                          ref.invalidate(searchResultsProvider);
-                        },
-                        onDelete: () => _deleteTask(task),
-                      ),
-                    );
-                  },
-                ),
+                    ],
+                  );
+                },
               ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildEmptyPrompt(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.search_rounded, size: 80, color: Colors.grey[400]),
-            const SizedBox(height: 20),
-            Text(
-              'Search for tasks',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Type to search by title or tags',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
-              textAlign: TextAlign.center,
             ),
           ],
         ),
@@ -146,87 +107,122 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     );
   }
 
-  Widget _buildNoResults(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.search_off_rounded, size: 80, color: Colors.grey[400]),
-            const SizedBox(height: 20),
-            Text(
-              'No results found',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Try a different search term',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
-              textAlign: TextAlign.center,
-            ),
-          ],
+  // --- AppBar adapted for clean look ---
+  AppBar _buildAppBar(ColorScheme cs, bool hasQuery) {
+    return AppBar(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      title: Text(
+        'Global Search',
+        style: TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: ResponsiveSize.fontSize(20),
+          color: cs.onSurface,
+        ),
+      ),
+      centerTitle: false,
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back_ios_new_rounded, color: cs.onSurface),
+        onPressed: () => AppRouter.router.pop(),
+      ),
+    );
+  }
+
+  // --- New Search Input Field Widget ---
+  Widget _buildSearchInputField(ColorScheme cs, String query) {
+    return Container(
+      decoration: BoxDecoration(
+        color: cs.surface,
+        borderRadius: BorderRadius.circular(ResponsiveSize.radius(16)),
+        border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.5)),
+      ),
+      child: TextField(
+        controller: _searchController,
+        autofocus: true,
+        style: TextStyle(fontSize: ResponsiveSize.fontSize(16)),
+        decoration: InputDecoration(
+          hintText: 'Search tasks by title or tags',
+          hintStyle: TextStyle(
+            color: cs.onSurfaceVariant.withValues(alpha: 0.7),
+            fontSize: ResponsiveSize.fontSize(16),
+          ),
+          border: InputBorder.none,
+          prefixIcon: Icon(
+            Icons.search_rounded,
+            size: ResponsiveSize.icon(22),
+            color: cs.onSurfaceVariant,
+          ),
+          suffixIcon: query.isNotEmpty
+              ? IconButton(
+                  icon: Icon(Icons.clear_rounded, color: cs.onSurfaceVariant),
+                  onPressed: () {
+                    _searchController.clear();
+                    _onSearchChanged();
+                  },
+                )
+              : null,
+          contentPadding: EdgeInsets.symmetric(
+            vertical: ResponsiveSize.height(12),
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildErrorState(BuildContext context, Object error) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.error_outline_rounded, size: 60, color: Colors.red),
-            const SizedBox(height: 16),
-            const Text('Search failed', style: TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Text(
-              error.toString(),
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey[700]),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
+  BoxDecoration _backgroundGradient(ColorScheme cs) {
+    return BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          cs.primary.withValues(alpha: 0.08),
+          Colors.transparent,
+        ],
+        stops: const [0.0, 0.4],
       ),
     );
   }
 
-  void _editTask(task) async {
-    final result = await Navigator.push(
+  void _editTask(Task task) async {
+    final updated = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => TaskEditorScreen(
-          listId: task.listId,
-          task: task,
-        ),
+        builder: (_) => TaskEditorScreen(listId: task.listId, task: task),
       ),
     );
-
-    if (result == true) {
-      ref.invalidate(searchResultsProvider);
-    }
+    // Invalidate results if edited
+    if (updated == true) ref.invalidate(searchResultsProvider);
+  }
+  
+  void _toggleTask(Task task) {
+    ref.read(tasksProvider(task.listId).notifier).toggleComplete(task);
+    // Also invalidate search results to reflect the status change
+    ref.invalidate(searchResultsProvider);
   }
 
-  void _deleteTask(task) {
+  void _showDelete(Task task) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Delete Task?'),
-        content: Text('Delete "${task.title}"? This cannot be undone.'),
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Colors.red[600], size: ResponsiveSize.icon(28)),
+            SizedBox(width: ResponsiveSize.width(12)),
+            const Text('Delete Task?', style: TextStyle(fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: Text('Delete "${task.title}"?\nThis cannot be undone.'),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
               ref.read(tasksProvider(task.listId).notifier).removeTask(task.id);
               Navigator.pop(context);
+              // Invalidate search results and the list that contained the task
               ref.invalidate(searchResultsProvider);
+              ref.invalidate(listsProvider); 
             },
             child: const Text('Delete'),
           ),

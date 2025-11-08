@@ -126,6 +126,8 @@ class Task {
     this.tags = const [],
   });
 
+  bool get completed => status == TaskStatus.done;
+
   factory Task.fromMap(Map<String, dynamic> map, {List<Tag>? tags}) {
     return Task(
       id: map['id'] as String,
@@ -185,6 +187,17 @@ class Task {
     final now = DateTime.now();
     final difference = dueDate!.difference(now);
     return difference.inHours <= 48 && difference.inHours >= 0;
+  }
+
+  // check if task is overdue (past due date and not completed) - ADDED
+  bool get isOverdue {
+    if (dueDate == null || completed) return false;
+    final today = DateTime.now();
+    // Only compare date parts to check for overdue status
+    final taskDate = DateTime(dueDate!.year, dueDate!.month, dueDate!.day);
+    final todayDate = DateTime(today.year, today.month, today.day);
+    
+    return taskDate.isBefore(todayDate);
   }
 }
 

@@ -21,6 +21,54 @@ class TaskDao {
     }
   }
 
+  // <--- ADDED: Get task count for a list --->
+  Future<Map<String, int>> getTaskCountsForLists(List<String> listIds) async {
+    if (listIds.isEmpty) return {};
+    try {
+      final db = await _dbHelper.database;
+      final List<Map<String, dynamic>> maps = await db.rawQuery('''
+        SELECT list_id, status, COUNT(id) as count
+        FROM tasks
+        WHERE list_id IN (${listIds.map((_) => '?').join(',')})
+        GROUP BY list_id, status
+      ''', listIds);
+
+      final Map<String, int> totalTasks = {};
+      final Map<String, int> doneTasks = {};
+
+      for (var map in maps) {
+        final listId = map['list_id'] as String;
+        final count = map['count'] as int;
+        final status = map['status'] as String;
+
+        totalTasks.update(
+          listId,
+          (value) => value + count,
+          ifAbsent: () => count,
+        );
+        if (status == TaskStatus.done.value) {
+          doneTasks.update(
+            listId,
+            (value) => value + count,
+            ifAbsent: () => count,
+          );
+        }
+      }
+
+      final Map<String, int> results = {};
+      for (final listId in listIds) {
+        // Encode total and done counts into a single integer, e.g., total * 1000 + done
+        // This is a simple trick. Total is max 999, done is max 999.
+        final total = totalTasks[listId] ?? 0;
+        final done = doneTasks[listId] ?? 0;
+        results[listId] = total * 1000 + done;
+      }
+      return results;
+    } catch (e) {
+      throw Exception('Failed to load task counts: $e');
+    }
+  }
+
   // create a new list
   Future<void> insertList(TaskList list) async {
     try {
@@ -54,11 +102,7 @@ class TaskDao {
   Future<void> deleteList(String listId) async {
     try {
       final db = await _dbHelper.database;
-      await db.delete(
-        'lists',
-        where: 'id = ?',
-        whereArgs: [listId],
-      );
+      await db.delete('lists', where: 'id = ?', whereArgs: [listId]);
     } catch (e) {
       throw Exception('Failed to delete list: $e');
     }
@@ -114,11 +158,14 @@ class TaskDao {
     try {
       final db = await _dbHelper.database;
       final now = DateTime.now().millisecondsSinceEpoch;
-      final later = DateTime.now().add(Duration(hours: 48)).millisecondsSinceEpoch;
+      final later = DateTime.now()
+          .add(Duration(hours: 48))
+          .millisecondsSinceEpoch;
 
       final List<Map<String, dynamic>> maps = await db.query(
         'tasks',
-        where: 'due_date IS NOT NULL AND due_date BETWEEN ? AND ? AND status != ?',
+        where:
+            'due_date IS NOT NULL AND due_date BETWEEN ? AND ? AND status != ?',
         whereArgs: [now, later, TaskStatus.done.value],
         orderBy: 'due_date ASC',
       );
@@ -138,7 +185,7 @@ class TaskDao {
   Future<List<Task>> searchTasks(String query) async {
     try {
       final db = await _dbHelper.database;
-      
+
       // search in task titles
       final titleMatches = await db.query(
         'tasks',
@@ -147,12 +194,15 @@ class TaskDao {
       );
 
       // search in tags
-      final tagMatches = await db.rawQuery('''
+      final tagMatches = await db.rawQuery(
+        '''
         SELECT DISTINCT t.* FROM tasks t
         INNER JOIN task_tags tt ON t.id = tt.task_id
         INNER JOIN tags tg ON tt.tag_id = tg.id
         WHERE tg.name LIKE ?
-      ''', ['%$query%']);
+      ''',
+        ['%$query%'],
+      );
 
       // combine results without duplicates
       final Map<String, Map<String, dynamic>> uniqueTasks = {};
@@ -185,11 +235,10 @@ class TaskDao {
 
         // link tags to the task
         for (var tag in task.tags) {
-          await txn.insert(
-            'task_tags',
-            {'task_id': task.id, 'tag_id': tag.id},
-            conflictAlgorithm: ConflictAlgorithm.replace,
-          );
+          await txn.insert('task_tags', {
+            'task_id': task.id,
+            'tag_id': tag.id,
+          }, conflictAlgorithm: ConflictAlgorithm.replace);
         }
       });
     } catch (e) {
@@ -219,11 +268,10 @@ class TaskDao {
 
         // add new tag links
         for (var tag in task.tags) {
-          await txn.insert(
-            'task_tags',
-            {'task_id': task.id, 'tag_id': tag.id},
-            conflictAlgorithm: ConflictAlgorithm.replace,
-          );
+          await txn.insert('task_tags', {
+            'task_id': task.id,
+            'tag_id': tag.id,
+          }, conflictAlgorithm: ConflictAlgorithm.replace);
         }
       });
     } catch (e) {
@@ -235,11 +283,7 @@ class TaskDao {
   Future<void> deleteTask(String taskId) async {
     try {
       final db = await _dbHelper.database;
-      await db.delete(
-        'tasks',
-        where: 'id = ?',
-        whereArgs: [taskId],
-      );
+      await db.delete('tasks', where: 'id = ?', whereArgs: [taskId]);
     } catch (e) {
       throw Exception('Failed to delete task: $e');
     }
@@ -248,11 +292,14 @@ class TaskDao {
   // get tags for a specific task
   Future<List<Tag>> _getTaskTags(String taskId) async {
     final db = await _dbHelper.database;
-    final List<Map<String, dynamic>> maps = await db.rawQuery('''
+    final List<Map<String, dynamic>> maps = await db.rawQuery(
+      '''
       SELECT t.* FROM tags t
       INNER JOIN task_tags tt ON t.id = tt.tag_id
       WHERE tt.task_id = ?
-    ''', [taskId]);
+    ''',
+      [taskId],
+    );
     return maps.map((map) => Tag.fromMap(map)).toList();
   }
 
@@ -285,11 +332,7 @@ class TaskDao {
   Future<void> deleteTag(String tagId) async {
     try {
       final db = await _dbHelper.database;
-      await db.delete(
-        'tags',
-        where: 'id = ?',
-        whereArgs: [tagId],
-      );
+      await db.delete('tags', where: 'id = ?', whereArgs: [tagId]);
     } catch (e) {
       throw Exception('Failed to delete tag: $e');
     }

@@ -1,7 +1,7 @@
 // lib/widgets/delete_confirmation_dialog.dart
 import 'package:flutter/material.dart';
 
-import '../../../task_core.dart';
+import '../../../../task_core.dart';
 
 void showDeleteConfirmationDialog({
   required BuildContext context,

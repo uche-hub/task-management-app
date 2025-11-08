@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../task_core.dart';
+import '../../../../task_core.dart';
 
 class ListsFAB extends StatelessWidget {
   final AnimationController controller;
@@ -19,7 +19,7 @@ class ListsFAB extends StatelessWidget {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-                color: cs.primary.withOpacity(0.4),
+                color: cs.primary.withValues(alpha: 0.4),
                 blurRadius: 25,
                 spreadRadius: 5),
           ],

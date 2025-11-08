@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../task_core.dart';
+import '../../../../task_core.dart';
 
 class ErrorState extends StatelessWidget {
   final Object error;

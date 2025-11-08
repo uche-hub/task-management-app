@@ -1,3 +1,4 @@
+// lib/task_core.dart
 
 library;
 
@@ -26,14 +27,20 @@ export 'package:task_management_app/features/presentation/screens/list_screen.da
 
 /// ---------- UTILS IMPORT --------------- ///
 export 'package:task_management_app/core/utils/app_responsiveness.dart';
+export 'package:task_management_app/core/utils/extensions.dart'; // <--- ADDED
+export 'package:task_management_app/core/utils/custom_toast.dart'; // <--- ADDED
+export 'package:task_management_app/core/utils/custom_loader.dart'; // <--- ADDED
+
+/// ---------- THEME IMPORT --------------- ///
+export 'package:task_management_app/core/theme/theme.dart'; // <--- ADDED
 
 /// ---------- WIDGETS IMPORT --------------- ///
-export 'package:task_management_app/features/presentation/widgets/create_list_dialog.dart';
-export 'package:task_management_app/features/presentation/widgets/delete_confirmation_dialog.dart';
-export 'package:task_management_app/features/presentation/widgets/empty_state.dart';
-export 'package:task_management_app/features/presentation/widgets/error_state.dart';
-export 'package:task_management_app/features/presentation/widgets/list_card.dart';
-export 'package:task_management_app/features/presentation/widgets/lists_fab.dart';
+export 'package:task_management_app/features/presentation/widgets/list%20screen%20widgets/create_list_dialog.dart';
+export 'package:task_management_app/features/presentation/widgets/list%20screen%20widgets/delete_confirmation_dialog.dart';
+export 'package:task_management_app/features/presentation/widgets/list%20screen%20widgets/empty_state.dart';
+export 'package:task_management_app/features/presentation/widgets/list%20screen%20widgets/error_state.dart';
+export 'package:task_management_app/features/presentation/widgets/list%20screen%20widgets/list_card.dart';
+export 'package:task_management_app/features/presentation/widgets/list%20screen%20widgets/lists_fab.dart';
 export 'package:task_management_app/features/presentation/widgets/shimmer_loading.dart';
 
 /// ---------- ROUTER IMPORT --------------- ///

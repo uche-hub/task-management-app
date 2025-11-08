@@ -1,3 +1,5 @@
+// lib/features/presentation/screens/list_screen.dart
+
 import 'package:flutter/material.dart';
 import '../../../task_core.dart';
 
@@ -30,8 +32,9 @@ class _ListsScreenState extends ConsumerState<ListsScreen>
 
   @override
   Widget build(BuildContext context) {
+    ResponsiveSize.init(context);
     final cs = Theme.of(context).colorScheme;
-    final listsAsync = ref.watch(listsProvider);
+    final listsAsync = ref.watch(listsProvider); 
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -39,10 +42,10 @@ class _ListsScreenState extends ConsumerState<ListsScreen>
       body: Container(
         decoration: _bgGradient(cs),
         child: listsAsync.when(
-          loading: () => const ShimmerLoading(),
+          loading: () => const CustomLoader(), 
           error: (e, _) => ErrorState(error: e, onRetry: _retry),
           data: (lists) =>
-              lists.isEmpty ? const EmptyState() : _listView(lists),
+              lists.isEmpty ? const EmptyState() : _buildRefreshableList(lists), // <--- CHANGED
         ),
       ),
       floatingActionButton: ListsFAB(
@@ -52,50 +55,55 @@ class _ListsScreenState extends ConsumerState<ListsScreen>
     );
   }
 
+  // --- NEW: Refreshable List Wrapper ---
+  Widget _buildRefreshableList(List<ListTaskStats> lists) {
+    // The RefreshIndicator calls the _retry function to reload data
+    return RefreshIndicator(
+      onRefresh: _retry,
+      color: Theme.of(context).colorScheme.primary,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      child: _listView(lists),
+    );
+  }
+  
+  // --- Existing AppBar & Background methods ---
+
   PreferredSizeWidget _appBar(ColorScheme cs) {
     return AppBar(
+      automaticallyImplyLeading: false, 
       backgroundColor: Colors.transparent,
       elevation: 0,
-      title: Text(
-        'My Lists',
-        style: TextStyle(
-          fontWeight: FontWeight.w800,
-          fontSize: ResponsiveSize.fontSize(28),
-          foreground: Paint()
-            ..shader = LinearGradient(
-              colors: [cs.primary, cs.secondary],
-            ).createShader(const Rect.fromLTWH(0, 0, 200, 70)),
+      title: Padding( 
+        padding: EdgeInsets.only(left: ResponsiveSize.width(4)),
+        child: Text(
+          'Manage your to do List', 
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: ResponsiveSize.fontSize(20),
+            color: cs.onSurface,
+          ),
         ),
       ),
-      centerTitle: true,
+      centerTitle: false,
       actions: [
         IconButton(
           icon: Container(
             padding: EdgeInsets.all(ResponsiveSize.width(8)),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.white.withOpacity(0.2),
-              border: Border.all(color: Colors.white.withOpacity(0.3)),
+              color: cs.surface.withValues(alpha: 0.2), 
+              border: Border.all(color: cs.onSurface.withValues(alpha: 0.1)), 
             ),
-            child: const Icon(
-              FontAwesome.search,
-              size: 18,
-              color: Colors.white,
+            child: Icon(
+              Icons.search_rounded,
+              size: ResponsiveSize.icon(24),
+              color: cs.onSurface,
             ),
           ),
           onPressed: () => AppRouter.router.push(RouterPath.searchScreen),
         ),
         SizedBox(width: ResponsiveSize.width(8)),
       ],
-      flexibleSpace: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [cs.primary.withOpacity(0.9), cs.primary.withOpacity(0.7)],
-          ),
-        ),
-      ),
     );
   }
 
@@ -103,12 +111,15 @@ class _ListsScreenState extends ConsumerState<ListsScreen>
     gradient: LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
-      colors: [cs.primary.withOpacity(0.1), Colors.transparent],
+      colors: [
+        cs.primary.withValues(alpha: 0.1),
+        Colors.transparent
+      ],
       stops: const [0.0, 0.3],
     ),
   );
 
-  Widget _listView(List<TaskList> lists) {
+  Widget _listView(List<ListTaskStats> lists) {
     return ListView.separated(
       padding: EdgeInsets.fromLTRB(
         ResponsiveSize.width(20),
@@ -119,31 +130,58 @@ class _ListsScreenState extends ConsumerState<ListsScreen>
       separatorBuilder: (_, __) => SizedBox(height: ResponsiveSize.height(16)),
       itemCount: lists.length,
       itemBuilder: (_, i) {
-        final list = lists[i];
+        final stats = lists[i];
         return ListCard(
-          list: list,
+          list: stats.list,
+          totalTasks: stats.totalTasks,
+          doneTasks: stats.doneTasks,
+          progress: stats.progress,
+          cardColor: _getCardColor(i),
           onTap: () =>
-              AppRouter.router.push(RouterPath.tasksScreen, extra: list),
-          onRename: () => _showRename(list),
-          onDelete: () => _showDelete(list),
+              AppRouter.router.push(RouterPath.tasksScreen, extra: stats.list),
+          onRename: () => _showRename(stats.list),
+          onDelete: () => _showDelete(stats.list),
         );
       },
     );
   }
+  
+  // --- Existing List Logic methods ---
 
-  void _retry() => ref.read(listsProvider.notifier).loadLists();
+  Color _getCardColor(int index) {
+    switch (index % 4) {
+      case 0:
+        return AppColors.cardColor1;
+      case 1:
+        return AppColors.cardColor2;
+      case 2:
+        return AppColors.cardColor3;
+      case 3:
+        return AppColors.cardColor4;
+      default:
+        return AppColors.cardColor4;
+    }
+  }
+
+  Future<void> _retry() async {
+    // Note: The RefreshIndicator expects a Future<void> return
+    await ref.read(listsProvider.notifier).loadLists();
+  }
 
   void _showCreate() => showCreateListDialog(
     context: context,
     title: 'Create New List',
     hint: 'e.g., Work, Personal, Ideas',
-    onConfirm: (name) {
+    onConfirm: (name) async {
       if (name.isNotEmpty) {
-        ref
-            .read(listsProvider.notifier)
-            .addList(
-              TaskList(id: _uuid.v4(), name: name, createdAt: DateTime.now()),
-            );
+        try {
+          await ref.read(listsProvider.notifier).addList(
+            TaskList(id: _uuid.v4(), name: name, createdAt: DateTime.now()),
+          );
+          if (mounted) showCustomToast(context, message: 'List created successfully!', isSuccess: true);
+        } catch (e) {
+          if (mounted) showCustomToast(context, message: 'Failed to create list: $e', isSuccess: false);
+        }
       }
     },
   );
@@ -153,9 +191,14 @@ class _ListsScreenState extends ConsumerState<ListsScreen>
     title: 'Rename List',
     initialValue: list.name,
     hint: 'New name',
-    onConfirm: (name) {
+    onConfirm: (name) async {
       if (name.isNotEmpty) {
-        ref.read(listsProvider.notifier).updateList(list.copyWith(name: name));
+        try {
+          await ref.read(listsProvider.notifier).updateList(list.copyWith(name: name));
+          if (mounted) showCustomToast(context, message: 'List renamed successfully!', isSuccess: true);
+        } catch (e) {
+          if (mounted) showCustomToast(context, message: 'Failed to rename list: $e', isSuccess: false);
+        }
       }
     },
   );
@@ -163,6 +206,13 @@ class _ListsScreenState extends ConsumerState<ListsScreen>
   void _showDelete(TaskList list) => showDeleteConfirmationDialog(
     context: context,
     listName: list.name,
-    onConfirm: () => ref.read(listsProvider.notifier).removeList(list.id),
+    onConfirm: () async {
+      try {
+        await ref.read(listsProvider.notifier).removeList(list.id);
+        if (mounted) showCustomToast(context, message: 'List deleted successfully!', isSuccess: true);
+      } catch (e) {
+        if (mounted) showCustomToast(context, message: 'Failed to delete list: $e', isSuccess: false);
+      }
+    },
   );
 }

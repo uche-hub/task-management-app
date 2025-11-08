@@ -1,5 +1,3 @@
-
-
 // sits between the UI and database
 // handles any business logic before saving/loading data
 import '../../../task_core.dart';
@@ -12,6 +10,27 @@ class TaskRepository {
   // list operations
   Future<List<TaskList>> getLists() async {
     return await _dao.getAllLists();
+  }
+
+  // <--- ADDED: Get task counts with combined data --->
+  Future<Map<String, ListTaskStats>> getListsWithTaskStats() async {
+    final lists = await _dao.getAllLists();
+    final listIds = lists.map((l) => l.id).toList();
+    final counts = await _dao.getTaskCountsForLists(listIds);
+
+    final Map<String, ListTaskStats> result = {};
+    for (final list in lists) {
+      final encodedCount = counts[list.id] ?? 0;
+      final done = encodedCount % 1000;
+      final total = encodedCount ~/ 1000;
+
+      result[list.id] = ListTaskStats(
+        list: list,
+        totalTasks: total,
+        doneTasks: done,
+      );
+    }
+    return result;
   }
 
   Future<void> createList(TaskList list) async {
@@ -105,10 +124,10 @@ class TaskRepository {
 
   // quick toggle task completion
   Future<void> toggleTaskComplete(Task task) async {
-    final newStatus = task.status == TaskStatus.done 
-        ? TaskStatus.todo 
+    final newStatus = task.status == TaskStatus.done
+        ? TaskStatus.todo
         : TaskStatus.done;
-    
+
     final updatedTask = task.copyWith(status: newStatus);
     await _dao.updateTask(updatedTask);
   }
@@ -132,7 +151,7 @@ class TaskRepository {
   // sort tasks by different criteria
   List<Task> sortTasks(List<Task> tasks, SortOption option) {
     final sortedTasks = List<Task>.from(tasks);
-    
+
     switch (option) {
       case SortOption.dueDate:
         sortedTasks.sort((a, b) {
@@ -143,28 +162,28 @@ class TaskRepository {
           return a.dueDate!.compareTo(b.dueDate!);
         });
         break;
-      
+
       case SortOption.priority:
         sortedTasks.sort((a, b) {
           // higher priority first
           return b.priority.value.compareTo(a.priority.value);
         });
         break;
-      
+
       case SortOption.createdDate:
         sortedTasks.sort((a, b) {
           return b.createdAt.compareTo(a.createdAt);
         });
         break;
     }
-    
+
     return sortedTasks;
   }
 
   // filter tasks by multiple tags
   List<Task> filterByTags(List<Task> tasks, List<String> tagIds) {
     if (tagIds.isEmpty) return tasks;
-    
+
     return tasks.where((task) {
       final taskTagIds = task.tags.map((t) => t.id).toSet();
       // task must have all selected tags
@@ -173,8 +192,18 @@ class TaskRepository {
   }
 }
 
-enum SortOption {
-  dueDate,
-  priority,
-  createdDate,
+class ListTaskStats {
+  final TaskList list;
+  final int totalTasks;
+  final int doneTasks;
+
+  ListTaskStats({
+    required this.list,
+    required this.totalTasks,
+    required this.doneTasks,
+  });
+
+  double get progress => totalTasks == 0 ? 0.0 : doneTasks / totalTasks;
 }
+
+enum SortOption { dueDate, priority, createdDate }
