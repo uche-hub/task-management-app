@@ -1,6 +1,7 @@
 // lib/features/presentation/widgets/task screen widgets/task_header_appbar.dart
 
 import 'package:flutter/material.dart';
+import 'package:task_management_app/core/enum/sort_option.dart';
 import 'package:task_management_app/core/enum/task_filter.dart';
 import '../../../../task_core.dart';
 

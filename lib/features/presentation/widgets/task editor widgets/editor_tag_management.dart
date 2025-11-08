@@ -1,6 +1,7 @@
 // lib/features/presentation/widgets/task editor widgets/editor_tag_management.dart
 
 import 'package:flutter/material.dart';
+import 'package:task_management_app/features/data/models/task_tag.dart';
 import '../../../../task_core.dart';
 
 class EditorTagManagement extends ConsumerWidget {

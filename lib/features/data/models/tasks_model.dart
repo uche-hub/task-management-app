@@ -1,108 +1,7 @@
-enum TaskPriority {
-  low,
-  medium,
-  high;
+import 'package:task_management_app/core/enum/task_priority.dart';
+import 'package:task_management_app/core/enum/task_status.dart';
+import 'package:task_management_app/features/data/models/task_tag.dart';
 
-  int get value {
-    switch (this) {
-      case TaskPriority.low:
-        return 0;
-      case TaskPriority.medium:
-        return 1;
-      case TaskPriority.high:
-        return 2;
-    }
-  }
-
-  static TaskPriority fromValue(int value) {
-    switch (value) {
-      case 0:
-        return TaskPriority.low;
-      case 1:
-        return TaskPriority.medium;
-      case 2:
-        return TaskPriority.high;
-      default:
-        return TaskPriority.medium;
-    }
-  }
-}
-
-enum TaskStatus {
-  todo,
-  inProgress,
-  done;
-
-  String get value {
-    switch (this) {
-      case TaskStatus.todo:
-        return 'todo';
-      case TaskStatus.inProgress:
-        return 'in_progress';
-      case TaskStatus.done:
-        return 'done';
-    }
-  }
-
-  static TaskStatus fromValue(String value) {
-    switch (value) {
-      case 'todo':
-        return TaskStatus.todo;
-      case 'in_progress':
-        return TaskStatus.inProgress;
-      case 'done':
-        return TaskStatus.done;
-      default:
-        return TaskStatus.todo;
-    }
-  }
-}
-
-// represents a task list
-class TaskList {
-  final String id;
-  final String name;
-  final DateTime createdAt;
-
-  TaskList({
-    required this.id,
-    required this.name,
-    required this.createdAt,
-  });
-
-  // convert from database row to object
-  factory TaskList.fromMap(Map<String, dynamic> map) {
-    return TaskList(
-      id: map['id'] as String,
-      name: map['name'] as String,
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
-    );
-  }
-
-  // convert object to database row
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'name': name,
-      'created_at': createdAt.millisecondsSinceEpoch,
-    };
-  }
-
-  // create a copy with some fields changed
-  TaskList copyWith({
-    String? id,
-    String? name,
-    DateTime? createdAt,
-  }) {
-    return TaskList(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      createdAt: createdAt ?? this.createdAt,
-    );
-  }
-}
-
-// represents a single task
 class Task {
   final String id;
   final String listId;
@@ -181,7 +80,7 @@ class Task {
     );
   }
 
-  // check if task is due soon (within 48 hours)
+  // check if task is due soon
   bool get isDueSoon {
     if (dueDate == null) return false;
     final now = DateTime.now();
@@ -189,7 +88,7 @@ class Task {
     return difference.inHours <= 48 && difference.inHours >= 0;
   }
 
-  // check if task is overdue (past due date and not completed) - ADDED
+  // check if task is overdue
   bool get isOverdue {
     if (dueDate == null || completed) return false;
     final today = DateTime.now();
@@ -198,46 +97,5 @@ class Task {
     final todayDate = DateTime(today.year, today.month, today.day);
     
     return taskDate.isBefore(todayDate);
-  }
-}
-
-// represents a tag
-class Tag {
-  final String id;
-  final String name;
-  final int color;
-
-  Tag({
-    required this.id,
-    required this.name,
-    required this.color,
-  });
-
-  factory Tag.fromMap(Map<String, dynamic> map) {
-    return Tag(
-      id: map['id'] as String,
-      name: map['name'] as String,
-      color: map['color'] as int,
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'name': name,
-      'color': color,
-    };
-  }
-
-  Tag copyWith({
-    String? id,
-    String? name,
-    int? color,
-  }) {
-    return Tag(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      color: color ?? this.color,
-    );
   }
 }

@@ -1,0 +1,1 @@
+enum SortOption { dueDate, priority, createdDate }

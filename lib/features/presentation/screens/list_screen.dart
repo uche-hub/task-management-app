@@ -1,6 +1,8 @@
 // lib/features/presentation/screens/list_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:task_management_app/features/data/models/task_list.dart';
+import 'package:task_management_app/features/data/repo/list_task_stats.dart';
 import '../../../task_core.dart';
 
 class ListsScreen extends ConsumerStatefulWidget {

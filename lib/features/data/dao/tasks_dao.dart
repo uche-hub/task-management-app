@@ -1,9 +1,10 @@
 import 'package:sqflite/sqflite.dart';
+import 'package:task_management_app/core/enum/task_status.dart';
+import 'package:task_management_app/features/data/models/task_list.dart';
+import 'package:task_management_app/features/data/models/task_tag.dart';
 
 import '../../../task_core.dart';
 
-// handles all database operations for tasks
-// this is the only place where we talk to the database
 class TaskDao {
   final DatabaseHelper _dbHelper = DatabaseHelper.instance;
 
@@ -21,7 +22,6 @@ class TaskDao {
     }
   }
 
-  // <--- ADDED: Get task count for a list --->
   Future<Map<String, int>> getTaskCountsForLists(List<String> listIds) async {
     if (listIds.isEmpty) return {};
     try {
@@ -57,8 +57,6 @@ class TaskDao {
 
       final Map<String, int> results = {};
       for (final listId in listIds) {
-        // Encode total and done counts into a single integer, e.g., total * 1000 + done
-        // This is a simple trick. Total is max 999, done is max 999.
         final total = totalTasks[listId] ?? 0;
         final done = doneTasks[listId] ?? 0;
         results[listId] = total * 1000 + done;
@@ -153,7 +151,7 @@ class TaskDao {
     }
   }
 
-  // get tasks that are due soon (next 48 hours)
+  // get tasks that are due soon
   Future<List<Task>> getDueSoonTasks() async {
     try {
       final db = await _dbHelper.database;
@@ -259,7 +257,7 @@ class TaskDao {
           whereArgs: [task.id],
         );
 
-        // remove old tag links
+        // remove old tag
         await txn.delete(
           'task_tags',
           where: 'task_id = ?',

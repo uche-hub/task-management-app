@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:task_management_app/core/enum/task_priority.dart';
+import 'package:task_management_app/core/enum/task_status.dart';
+import 'package:task_management_app/features/data/models/task_tag.dart';
 import '../../../task_core.dart';
 import '../widgets/task editor widgets/editor_tag_management.dart';
 import '../widgets/task editor widgets/editor_priority_selector_segmented.dart'; 

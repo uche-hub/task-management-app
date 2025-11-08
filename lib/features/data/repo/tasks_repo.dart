@@ -1,5 +1,9 @@
-// sits between the UI and database
-// handles any business logic before saving/loading data
+import 'package:task_management_app/core/enum/sort_option.dart';
+import 'package:task_management_app/core/enum/task_status.dart';
+import 'package:task_management_app/features/data/models/task_list.dart';
+import 'package:task_management_app/features/data/models/task_tag.dart';
+import 'package:task_management_app/features/data/repo/list_task_stats.dart';
+
 import '../../../task_core.dart';
 
 class TaskRepository {
@@ -12,7 +16,6 @@ class TaskRepository {
     return await _dao.getAllLists();
   }
 
-  // <--- ADDED: Get task counts with combined data --->
   Future<Map<String, ListTaskStats>> getListsWithTaskStats() async {
     final lists = await _dao.getAllLists();
     final listIds = lists.map((l) => l.id).toList();
@@ -78,7 +81,7 @@ class TaskRepository {
       throw Exception('Task title cannot be empty');
     }
 
-    // make sure due date isn't in the past
+    // made sure due date isn't in the past
     if (task.dueDate != null) {
       final now = DateTime.now();
       final taskDate = DateTime(
@@ -148,14 +151,13 @@ class TaskRepository {
     await _dao.deleteTag(tagId);
   }
 
-  // sort tasks by different criteria
+  // sort tasks by criteria
   List<Task> sortTasks(List<Task> tasks, SortOption option) {
     final sortedTasks = List<Task>.from(tasks);
 
     switch (option) {
       case SortOption.dueDate:
         sortedTasks.sort((a, b) {
-          // tasks without due date go to the end
           if (a.dueDate == null && b.dueDate == null) return 0;
           if (a.dueDate == null) return 1;
           if (b.dueDate == null) return -1;
@@ -192,18 +194,3 @@ class TaskRepository {
   }
 }
 
-class ListTaskStats {
-  final TaskList list;
-  final int totalTasks;
-  final int doneTasks;
-
-  ListTaskStats({
-    required this.list,
-    required this.totalTasks,
-    required this.doneTasks,
-  });
-
-  double get progress => totalTasks == 0 ? 0.0 : doneTasks / totalTasks;
-}
-
-enum SortOption { dueDate, priority, createdDate }

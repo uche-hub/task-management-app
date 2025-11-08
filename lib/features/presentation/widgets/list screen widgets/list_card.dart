@@ -1,6 +1,7 @@
 // lib/features/presentation/widgets/list screen widgets/list_card.dart
 
 import 'package:flutter/material.dart';
+import 'package:task_management_app/features/data/models/task_list.dart';
 import '../../../../task_core.dart';
 
 // Removed 'dart:ui' import
