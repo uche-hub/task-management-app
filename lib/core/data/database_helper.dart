@@ -28,9 +28,9 @@ class DatabaseHelper {
     );
   }
 
-  // first time setup - create all tables
+  // creates all tables
   Future<void> _createDB(Database db, int version) async {
-    // lists table - where we store task lists
+    // stores task lists
     await db.execute('''
       CREATE TABLE lists (
         id TEXT PRIMARY KEY,
@@ -39,7 +39,7 @@ class DatabaseHelper {
       )
     ''');
 
-    // tasks table - the actual tasks
+    // actual tasks
     await db.execute('''
       CREATE TABLE tasks (
         id TEXT PRIMARY KEY,
@@ -54,7 +54,7 @@ class DatabaseHelper {
       )
     ''');
 
-    // tags table - stores all available tags
+    // stores all available tags
     await db.execute('''
       CREATE TABLE tags (
         id TEXT PRIMARY KEY,
@@ -63,7 +63,7 @@ class DatabaseHelper {
       )
     ''');
 
-    // link tasks to tags (many-to-many)
+    // link tasks to tags
     await db.execute('''
       CREATE TABLE task_tags (
         task_id TEXT NOT NULL,
@@ -74,7 +74,7 @@ class DatabaseHelper {
       )
     ''');
 
-    // settings table for app preferences
+    // settings table
     await db.execute('''
       CREATE TABLE settings (
         key TEXT PRIMARY KEY,
@@ -88,7 +88,7 @@ class DatabaseHelper {
     await db.execute('CREATE INDEX idx_tasks_due_date ON tasks(due_date)');
   }
 
-  // handle version upgrades - this is where migrations go
+  // handle version upgrades
   Future<void> _upgradeDB(Database db, int oldVersion, int newVersion) async {
     // version 1 to 2: added settings table
     if (oldVersion < 2) {
@@ -108,7 +108,7 @@ class DatabaseHelper {
     _database = null;
   }
 
-  // wipe everything - useful for testing
+  // wipe everything (useful for testing)
   Future<void> deleteDatabase() async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, 'tasks.db');
