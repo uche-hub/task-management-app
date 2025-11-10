@@ -20,8 +20,8 @@ class TaskManagerApp extends StatelessWidget {
     return MaterialApp.router(
       title: 'Task Manager',
       debugShowCheckedModeBanner: false,
-      theme: lightTheme, // <--- CHANGED
-      darkTheme: darkTheme, // <--- CHANGED
+      theme: lightTheme,
+      darkTheme: darkTheme,
       routerConfig: AppRouter.router,
     );
   }
