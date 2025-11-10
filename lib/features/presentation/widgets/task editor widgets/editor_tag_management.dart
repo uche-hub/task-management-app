@@ -138,65 +138,67 @@ class EditorTagManagement extends ConsumerWidget {
             'Create Tag',
             style: TextStyle(fontWeight: FontWeight.w600),
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextField(
-                controller: controller,
-                decoration: InputDecoration(
-                  labelText: 'Tag name',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      ResponsiveSize.radius(12),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextField(
+                  controller: controller,
+                  decoration: InputDecoration(
+                    labelText: 'Tag name',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        ResponsiveSize.radius(12),
+                      ),
                     ),
                   ),
+                  textCapitalization: TextCapitalization.words,
                 ),
-                textCapitalization: TextCapitalization.words,
-              ),
-              SizedBox(height: ResponsiveSize.height(24)),
-              const Text(
-                'Color',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-              ),
-              SizedBox(height: ResponsiveSize.height(12)),
-              Wrap(
-                spacing: ResponsiveSize.width(12),
-                children:
-                    [
-                      Colors.red,
-                      Colors.orange,
-                      Colors.yellow,
-                      Colors.green,
-                      Colors.blue,
-                      Colors.purple,
-                      Colors.pink,
-                    ].map((color) {
-                      final isSelected = selectedColor == color;
-                      return GestureDetector(
-                        onTap: () => setState(() => selectedColor = color),
-                        child: Container(
-                          width: ResponsiveSize.width(44),
-                          height: ResponsiveSize.height(44),
-                          decoration: BoxDecoration(
-                            color: color,
-                            shape: BoxShape.circle,
-                            border: isSelected
-                                ? Border.all(color: Colors.black, width: 3)
+                SizedBox(height: ResponsiveSize.height(24)),
+                const Text(
+                  'Color',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                ),
+                SizedBox(height: ResponsiveSize.height(12)),
+                Wrap(
+                  spacing: ResponsiveSize.width(8),
+                  children:
+                      [
+                        Colors.red,
+                        Colors.orange,
+                        Colors.yellow,
+                        Colors.green,
+                        Colors.blue,
+                        Colors.purple,
+                        Colors.pink,
+                      ].map((color) {
+                        final isSelected = selectedColor == color;
+                        return GestureDetector(
+                          onTap: () => setState(() => selectedColor = color),
+                          child: Container(
+                            width: ResponsiveSize.width(30),
+                            height: ResponsiveSize.height(44),
+                            decoration: BoxDecoration(
+                              color: color,
+                              shape: BoxShape.circle,
+                              border: isSelected
+                                  ? Border.all(color: Colors.black, width: 3)
+                                  : null,
+                            ),
+                            child: isSelected
+                                ? const Icon(
+                                    Icons.check_rounded,
+                                    color: Colors.white,
+                                    size: 20,
+                                  )
                                 : null,
                           ),
-                          child: isSelected
-                              ? const Icon(
-                                  Icons.check_rounded,
-                                  color: Colors.white,
-                                  size: 20,
-                                )
-                              : null,
-                        ),
-                      );
-                    }).toList(),
-              ),
-            ],
+                        );
+                      }).toList(),
+                ),
+              ],
+            ),
           ),
           actions: [
             TextButton(

@@ -105,22 +105,7 @@ class TaskListItem extends StatelessWidget {
                     color: isOverdue ? Colors.red : cs.onSurfaceVariant,
                     fontWeight: isOverdue ? FontWeight.bold : FontWeight.normal,
                   ),
-                ),
-                const Spacer(),
-
-                Icon(
-                  Icons.chat_bubble_outline_rounded,
-                  size: ResponsiveSize.icon(16),
-                  color: cs.onSurfaceVariant,
-                ),
-                SizedBox(width: ResponsiveSize.width(4)),
-                Text(
-                  '${(task.title.length * 3) % 20 + 5} Feedback', // Mock Data
-                  style: TextStyle(
-                    fontSize: ResponsiveSize.fontSize(14),
-                    color: cs.onSurfaceVariant,
-                  ),
-                ),
+                )
               ],
             ),
             SizedBox(height: ResponsiveSize.height(12)),
