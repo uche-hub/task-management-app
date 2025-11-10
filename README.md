@@ -133,3 +133,18 @@ Before running the project, ensure you have the following installed:
 
 - **Flutter SDK** (v3.0.0 or higher)  
 - **Dart SDK** (v3.0.0 or higher)  
+
+### ▶️ Run the App
+
+```bash
+# Clone the repository
+git clone https://github.com/uche-hub/task-management-app.git
+
+# Navigate into the project directory
+cd task_manager_app
+
+# Get all dependencies
+flutter pub get
+
+# Run the app
+flutter run
